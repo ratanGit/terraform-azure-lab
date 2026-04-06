@@ -21,3 +21,28 @@ variable "subnets" {
     type = string # public or private
   }))
 }
+
+variable "my_ip" {
+  description = "Your public IP address in CIDR notation"
+  type        = string
+}
+
+############################################
+# VM / SSH settings
+############################################
+
+variable "vm_admin_username" {
+  description = "Admin username for Linux VMs"
+  type        = string
+}
+
+variable "vm_ssh_public_key_path" {
+  description = "Path to SSH public key for VM access"
+  type        = string
+}
+
+variable "vm_size" {
+  description = "Azure VM size"
+  type        = string
+  default     = "Standard_B2s"
+}
