@@ -1,0 +1,16 @@
+env      = "lab"
+location = "canadacentral"
+
+vnet_cidr = "10.0.0.0/16"
+
+subnets = {
+  public = {
+    cidr = "10.0.1.0/24"
+    type = "public"
+  }
+
+  private = {
+    cidr = "10.0.2.0/24"
+    type = "private"
+  }
+}
