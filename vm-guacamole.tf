@@ -66,7 +66,7 @@ source_image_reference {
 
 
   custom_data = base64encode(
-    file("${path.module}/cloud-init-docker.yaml")
+    file("${path.module}/cloud-init-docker.tpl")
   )
 
   tags = {

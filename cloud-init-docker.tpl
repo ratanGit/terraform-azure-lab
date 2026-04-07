@@ -6,4 +6,4 @@ runcmd:
   - curl -fsSL https://get.docker.com | sh
   - systemctl enable docker
   - systemctl start docker
-  - usermod -aG docker var.vm_admin_username
+  - usermod -aG docker ${vm_admin_username}
