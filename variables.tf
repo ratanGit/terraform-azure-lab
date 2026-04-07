@@ -46,3 +46,9 @@ variable "vm_size" {
   type        = string
   default     = "Standard_B2s"
 }
+
+
+variable "guacamole_dns_name" {
+  description = "Public DNS name for Guacamole (e.g. guac.example.com)"
+  type        = string
+}

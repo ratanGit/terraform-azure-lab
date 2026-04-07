@@ -21,3 +21,5 @@ Thumbs.db
 # SSH keys
 guac
 *.pem
+.env
+.env.tpl
