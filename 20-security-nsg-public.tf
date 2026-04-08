@@ -80,19 +80,19 @@ resource "azurerm_network_security_rule" "public_npm_admin" {
 }
 
 # 5. Guacamole Direct Testing (Restricted to My IP)
-resource "azurerm_network_security_rule" "public_guac_test" {
-  name                        = "Allow-Guacamole-Direct-8080"
-  priority                    = 140
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "8080"
-  source_address_prefix       = var.my_ip
-  destination_address_prefix  = "*"
-  resource_group_name         = data.azurerm_resource_group.this.name
-  network_security_group_name = azurerm_network_security_group.nsg_public.name
-}
+#resource "azurerm_network_security_rule" "public_guac_test" {
+#  name                        = "Allow-Guacamole-Direct-8080"
+#  priority                    = 140
+##  direction                   = "Inbound"
+#  access                      = "Allow"
+#  protocol                    = "Tcp"
+#  source_port_range           = "*"
+#  destination_port_range      = "8080"
+#  source_address_prefix       = var.my_ip
+#  destination_address_prefix  = "*"
+#  resource_group_name         = data.azurerm_resource_group.this.name
+#  network_security_group_name = azurerm_network_security_group.nsg_public.name
+#}
 
 ############################################
 # NSG -> Subnet Association
