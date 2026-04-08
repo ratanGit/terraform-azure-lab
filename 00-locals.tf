@@ -1,6 +1,18 @@
 locals {
-  name_prefix = "lab"
+  # --- Identity & Naming ---
+  name_prefix = "lab-ratan"
+  
+  # --- The "Who & Purpose" Tags ---
+  common_tags = {
+    Project     = "Remote-Access-Gateway"
+    Environment = "Lab"
+    Owner       = "Ratan Mohapatra"
+    Purpose     = "Guacamole-MFA-Deployment"
+    ManagedBy   = "Terraform"
+    Location    = "Ottawa"
+  }
 
+  # --- Networking Logic ---
   vnet_name = "${local.name_prefix}-vnet"
 
   subnets = {
