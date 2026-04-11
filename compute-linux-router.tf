@@ -83,7 +83,7 @@ resource "azurerm_subnet_route_table_association" "private" {
 }
 
 ############################################
-# Linux Router VM
+# Linux Router VM (NAT Gateway Replacement)
 ############################################
 
 resource "azurerm_linux_virtual_machine" "router" {
@@ -91,20 +91,50 @@ resource "azurerm_linux_virtual_machine" "router" {
   location            = azurerm_resource_group.this.location
   resource_group_name = azurerm_resource_group.this.name
 
-  size           = var.linux_vm_size
-  admin_username = var.linux_vm_admin_username
+  size                            = var.linux_vm_size
+  admin_username                  = var.linux_vm_admin_username
   disable_password_authentication = true
 
+  ##########################################
+  # SSH Access (Terraform-managed RSA key)
+  ##########################################
   admin_ssh_key {
     username   = var.linux_vm_admin_username
     public_key = trimspace(tls_private_key.guacamole.public_key_openssh)
   }
 
+  ##########################################
+  # Dual-Homed NICs (Order matters!)
+  # eth0 = WAN (public)
+  # eth1 = LAN (private)
+  ##########################################
   network_interface_ids = [
     azurerm_network_interface.router_wan.id,
     azurerm_network_interface.router_lan.id
   ]
 
+  ##########################################
+  # Cloud-init: Enable routing + NAT
+  ##########################################
+  custom_data = base64encode(
+    templatefile(
+      "${path.module}/cloud-init-files/cloud-init-linux-router.tpl",
+      {}
+    )
+  )
+
+  ##########################################
+  # OS Disk
+  ##########################################
+  os_disk {
+    name                 = "${local.name_prefix}-osdisk-router"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  ##########################################
+  # Ubuntu Image (variable-driven)
+  ##########################################
   source_image_reference {
     publisher = var.ubuntu_image.publisher
     offer     = var.ubuntu_image.offer
@@ -112,10 +142,11 @@ resource "azurerm_linux_virtual_machine" "router" {
     version   = var.ubuntu_image.version
   }
 
-  os_disk {
-    caching              = "ReadWrite"
-    storage_account_type = "Standard_LRS"
-  }
-
-  tags = merge(local.common_tags, { Role = "Linux-Router" })
+  ##########################################
+  # Tags
+  ##########################################
+  tags = merge(local.common_tags, {
+    Role = "Linux-Router"
+    Tier = "Network"
+  })
 }

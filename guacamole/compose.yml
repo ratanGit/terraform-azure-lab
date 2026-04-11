@@ -60,7 +60,6 @@ services:
     volumes:
       - ${NPM_DATA_PATH}:/data
       - ${LETSENCRYPT_PATH}:/etc/letsencrypt
-      - ./nginx:/data/nginx/custom  # <--- THIS LINE AUTOMATES IT
     networks:
       - guac_network
 
