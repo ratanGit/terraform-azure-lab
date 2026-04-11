@@ -3,9 +3,9 @@ locals {
   # IDENTITY & PROJECT METADATA
   # Defines the naming convention and global tagging strategy.
   ###############################################################################
-  environment  = var.environment
+  environment = var.environment
 
-# 1. Author Logic
+  # 1. Author Logic
   # If var.author is "ratan mohapatra", this gets "ratan"
   first_name = lower(split(" ", trimspace(var.author))[0])
 
@@ -24,17 +24,17 @@ locals {
     Environment = var.environment # Fixed the "nt" typo here
     Purpose     = "Remote-Access-Gateway"
     ManagedBy   = "Terraform"
-    Location    = "Ottawa"  
+    Location    = "Ottawa"
   }
 
   # Fixed the "primitive-typed value" error
   # Since name_prefix is a local, call it directly:
 
-  
 
-###############################################################################
-# NETWORK ABSTRACTION & FLATTENING
-###############################################################################
+
+  ###############################################################################
+  # NETWORK ABSTRACTION & FLATTENING
+  ###############################################################################
 
   vnet_name = "${local.name_prefix}-vnet"
 

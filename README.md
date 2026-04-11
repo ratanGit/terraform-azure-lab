@@ -92,7 +92,6 @@ The design follows **modern Zero Trust principles**:
 *   Reachable only via Guacamole or internal routing
 
 ***
-
 ## Infrastructure as Code
 
 *   **Terraform**
@@ -165,18 +164,33 @@ This design significantly reduces monthly Azure spend for lab and non‑producti
 
 ***
 
+## NGINX Proxy
+# Redirect root to Guacamole
+location = / {
+    return 301 /guacamole/;
+}
+
+# Apache Guacamole reverse proxy
+location /guacamole/ {
+    proxy_pass http://guacamole-app:8080/guacamole/;
+    proxy_buffering off;
+    proxy_http_version 1.1;
+
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-Host $host;
+
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
+}
+
 ## Author
 
 **Ratan Mohapatra**  
 Azure | Zero Trust | Cloud Architecture
 
 ***
-
-If you’d like, next I can:
-
-*   Generate **Markdown‑friendly output helpers**
-*   Add a **Quick Start section**
-*   Write a **terraform.tfvars.example**
-*   Prepare a **second diagram (ingress vs egress)**
 
 

@@ -55,11 +55,11 @@ output "access_information" {
 
   value = {
     guacamole = {
-      public_ip      = azurerm_public_ip.guacamole.ip_address
-      ssh_user       = var.linux_vm_admin_username
-      ssh_key_path   = local_file.guacamole_private_key.filename
-      https_url      = "https://${azurerm_public_ip.guacamole.ip_address}"
-      ssh_command    = "ssh -i ${local_file.guacamole_private_key.filename} ${var.linux_vm_admin_username}@${azurerm_public_ip.guacamole.ip_address}"
+      public_ip    = azurerm_public_ip.guacamole.ip_address
+      ssh_user     = var.linux_vm_admin_username
+      ssh_key_path = local_file.guacamole_private_key.filename
+      https_url    = "https://${azurerm_public_ip.guacamole.ip_address}"
+      ssh_command  = "ssh -i ${local_file.guacamole_private_key.filename} ${var.linux_vm_admin_username}@${azurerm_public_ip.guacamole.ip_address}"
     }
 
     router = {

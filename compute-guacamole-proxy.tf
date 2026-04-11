@@ -24,7 +24,6 @@ resource "azurerm_network_interface" "guacamole" {
   }
 }
 
-
 ############################################
 # 2. Linux VM with Docker Cloud-Init
 ############################################
@@ -36,15 +35,15 @@ resource "azurerm_linux_virtual_machine" "guacamole" {
   admin_username      = var.linux_vm_admin_username
 
   disable_password_authentication = true
-  
-admin_ssh_key {
-  username   = var.linux_vm_admin_username
-  public_key = trimspace(tls_private_key.guacamole.public_key_openssh)
-}
+
+  admin_ssh_key {
+    username   = var.linux_vm_admin_username
+    public_key = trimspace(tls_private_key.guacamole.public_key_openssh)
+  }
 
   network_interface_ids = [azurerm_network_interface.guacamole.id]
 
-  custom_data = base64encode(templatefile("${path.module}/cloud-init-docker.tpl", {
+  custom_data = base64encode(templatefile("${path.module}/cloud-init-files/cloud-init-docker.tpl", {
     admin_username = var.linux_vm_admin_username
   }))
 

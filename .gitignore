@@ -1,25 +1,28 @@
-# Terraform
+# Terraform runtime
 .terraform/
-*.tfstate
-*.tfstate.*
-*.tfvars
-*.tfvars.json
+terraform.tfstate
+terraform.tfstate.backup
 crash.log
-*.log
 
-# Local overrides
+
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
 
-# Editor / OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-# SSH keys
+
+# Terraform variable overrides
+terraform.tfvars
+
+# Sensitive key material
 guac
 *.pem
+*.key
 .env
-.env.tpl
+
+# OS / editor noise
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.log

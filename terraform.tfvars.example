@@ -1,19 +1,19 @@
 ###############################################################################
 # GLOBAL SETTINGS
 ###############################################################################
-location            = "canadaeast"
-resource_group_name = "rg-mylab-guac-canada"
-my_ip               = "5.5.34.55/32"
+location            = "canadacentral"
+resource_group_name = "rg-guacamole-canadalab"
+my_ip               = "1.2.3.4/32"
 
 ###############################################################################
 # NETWORK TOPOLOGY
 ###############################################################################
 vnet_cidr = {
   "Lab" = {
-    address_space = ["10.110.0.0/16"]
+    address_space = ["10.5.0.0/16"]
     subnets = {
-      "public"  = "10.110.2.0/24" # For WAN NICs and Bastion
-      "private" = "10.100.3.0/24" # For LAN NICs and Internal LB
+      "public"  = "10.5.2.0/24" # For WAN NICs and Bastion
+      "private" = "10.5.3.0/24" # For LAN NICs and Internal LB
     }
   }
 }
@@ -23,9 +23,9 @@ vnet_cidr = {
 ###############################################################################
 
 # Guacamole VM Size (Linux 24.04)
-#guac_vm_size        = "Standard_D2as_v5"
-linux_vm_admin_username  = "ratan"
-guac_db_password   = "strong PW"
-npm_db_password    = "strong PW"
-guacamole_dns_name = "guac.example.com"
-base_path          = "." # WHERE THE DCOKER COMPOSE IS RAN
+guac_vm_size            = "Standard_D2s_v5"
+linux_vm_size           = "Standard_D2s_v5"
+linux_vm_admin_username = "ratan"
+guac_db_password        = "x7nD8NGrRN97g7l5EKZGCaQf2hASe7hW"
+npm_db_password         = "UsAktH1SG9jfjaUO8dbSWc82gHFj07Vm"
+guacamole_dns_name      = "auratek.ddns.net"
