@@ -3,46 +3,49 @@
 ############################################
 resource "azurerm_public_ip" "guacamole" {
   name                = "${local.name_prefix}-pip-guacamole"
-  location            = data.azurerm_resource_group.this.location
-  resource_group_name = data.azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
   allocation_method   = "Static"
   sku                 = "Standard"
   tags                = local.common_tags
 }
 
+
 resource "azurerm_network_interface" "guacamole" {
   name                = "${local.name_prefix}-nic-guacamole"
-  location            = data.azurerm_resource_group.this.location
-  resource_group_name = data.azurerm_resource_group.this.name
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
 
   ip_configuration {
     name                          = "primary"
-    subnet_id                     = azurerm_subnet.public["public"].id
+    subnet_id                     = azurerm_subnet.this["public"].id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.guacamole.id
   }
 }
+
 
 ############################################
 # 2. Linux VM with Docker Cloud-Init
 ############################################
 resource "azurerm_linux_virtual_machine" "guacamole" {
   name                = "${local.name_prefix}-vm-guacamole"
-  location            = data.azurerm_resource_group.this.location
-  resource_group_name = data.azurerm_resource_group.this.name
-  size                = var.vm_size
-  admin_username      = var.vm_admin_username
+  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.this.name
+  size                = var.guac_vm_size
+  admin_username      = var.linux_vm_admin_username
 
   disable_password_authentication = true
-  admin_ssh_key {
-    username   = var.vm_admin_username
-    public_key = tls_private_key.guacamole.public_key_openssh
-  }
+  
+admin_ssh_key {
+  username   = var.linux_vm_admin_username
+  public_key = trimspace(tls_private_key.guacamole.public_key_openssh)
+}
 
   network_interface_ids = [azurerm_network_interface.guacamole.id]
 
   custom_data = base64encode(templatefile("${path.module}/cloud-init-docker.tpl", {
-    admin_username = var.vm_admin_username
+    admin_username = var.linux_vm_admin_username
   }))
 
   os_disk {
@@ -52,15 +55,15 @@ resource "azurerm_linux_virtual_machine" "guacamole" {
   }
 
   source_image_reference {
-    publisher = var.vm_image_publisher
-    offer     = var.vm_image_offer
-    sku       = var.vm_image_sku
-    version   = var.vm_image_version
+    publisher = var.ubuntu_image.publisher
+    offer     = var.ubuntu_image.offer
+    sku       = var.ubuntu_image.sku
+    version   = var.ubuntu_image.version
   }
 
-  vtpm_enabled         = true
-  secure_boot_enabled  = true  
-  tags                 = merge(local.common_tags, { Role = "Guacamole-Gateway" })
+  vtpm_enabled        = true
+  secure_boot_enabled = true
+  tags                = merge(local.common_tags, { Role = "Guacamole-Gateway" })
 }
 
 ############################################
@@ -81,7 +84,7 @@ resource "null_resource" "guacamole_deploy" {
   connection {
     type        = "ssh"
     host        = azurerm_public_ip.guacamole.ip_address
-    user        = var.vm_admin_username
+    user        = var.linux_vm_admin_username
     private_key = tls_private_key.guacamole.private_key_pem
   }
 
@@ -89,22 +92,22 @@ resource "null_resource" "guacamole_deploy" {
   provisioner "remote-exec" {
     inline = [
       "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for Cloud-Init...'; sleep 5; done",
-      "mkdir -p /home/${var.vm_admin_username}/guacamole/nginx"
+      "mkdir -p /home/${var.linux_vm_admin_username}/guacamole/nginx"
     ]
   }
 
   # Step B: Copy EVERYTHING (Rendered .env, compose, and nginx folder)
   provisioner "file" {
     source      = "${path.module}/guacamole/"
-    destination = "/home/${var.vm_admin_username}/guacamole"
+    destination = "/home/${var.linux_vm_admin_username}/guacamole"
   }
 
   # Step C: The Self-Healing Engine
   provisioner "remote-exec" {
     inline = [
-      "cd /home/${var.vm_admin_username}/guacamole",
+      "cd /home/${var.linux_vm_admin_username}/guacamole",
       "sudo docker compose up -d",
-      
+
       "echo 'Waiting for Postgres engine...'",
       "until sudo docker exec guacamole-db pg_isready -U guacamole_user; do sleep 5; done",
 

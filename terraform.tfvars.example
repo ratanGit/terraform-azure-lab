@@ -1,16 +1,31 @@
-env      = "lab"
-location = "canadacentral"
+###############################################################################
+# GLOBAL SETTINGS
+###############################################################################
+location            = "canadaeast"
+resource_group_name = "rg-mylab-guac-canada"
+my_ip               = "5.5.34.55/32"
 
-vnet_cidr = "10.0.0.0/16"
-
-subnets = {
-  public = {
-    cidr = "10.0.1.0/24"
-    type = "public"
-  }
-
-  private = {
-    cidr = "10.0.2.0/24"
-    type = "private"
+###############################################################################
+# NETWORK TOPOLOGY
+###############################################################################
+vnet_cidr = {
+  "Lab" = {
+    address_space = ["10.110.0.0/16"]
+    subnets = {
+      "public"  = "10.110.2.0/24" # For WAN NICs and Bastion
+      "private" = "10.100.3.0/24" # For LAN NICs and Internal LB
+    }
   }
 }
+
+###############################################################################
+# COMPUTE & ACCESS
+###############################################################################
+
+# Guacamole VM Size (Linux 24.04)
+#guac_vm_size        = "Standard_D2as_v5"
+linux_vm_admin_username  = "ratan"
+guac_db_password   = "strong PW"
+npm_db_password    = "strong PW"
+guacamole_dns_name = "guac.example.com"
+base_path          = "." # WHERE THE DCOKER COMPOSE IS RAN
