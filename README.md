@@ -16,17 +16,9 @@ The design follows **modern Zero Trust principles**:
 
 ## High-Level Architecture
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-[![Architecture Diagram](./images/image.png)](./images/image.png)
+![Architecture Diagram](./images/image.png)](./images/image.png)
 
 <small>*Figure: High-level architecture of the Azure Guacamole lab*</small>
-=======
-images
->>>>>>> a7cfc17 (Refactor Terraform: added image to readme)
-=======
-[![Architecture Diagram](./images/image.png)](./images/image.png)
->>>>>>> 824ece6 (Refactor Terraform: added image to readme)
 
 ### Key Components
 
