@@ -1,71 +1,87 @@
-# Azure Guacamole Lab – Secure Remote Access Architecture
+![Terraform](https://img.shields.io/badge/Terraform-IaC-blueviolet)
+![Azure](https://img.shields.io/badge/Azure-Cloud-blue)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+![Repo Size](https://img.shields.io/github/repo-size/ratanGit/terraform-azure-lab)
+![Last Commit](https://img.shields.io/github/last-commit/ratanGit/terraform-azure-lab)
+
+# Terraform Azure Lab – Secure Remote Access Architecture
 
 ## Overview
 
+This project deploys a **secure Azure lab environment** using **Terraform**, centered around **Apache Guacamole** as a web‑based remote access gateway.
 
-This project deploys a **secure Azure lab environment** using **Terraform**, centered around **Apache Guacamole** as a web‑based remote access gateway.  
-It enables **browser‑based SSH and RDP access** to private workloads without exposing internal machines directly to the internet.
+The lab enables **browser‑based SSH and RDP access** to private workloads without exposing internal machines directly to the internet.
 
-The design follows **modern Zero Trust principles**:
+The design follows **Zero Trust principles**:
 
-*   No public IPs on internal workloads
-*   Controlled ingress via Guacamole
-*   Controlled egress via a custom Linux router (no Azure NAT Gateway)
+- No public IPs on internal workloads
+- Controlled ingress via Guacamole
+- Infrastructure as Code (Terraform)
+- Lab‑friendly and production‑aware structure
 
-***
+---
 
-## High-Level Architecture
+## High‑Level Architecture
 
+![Architecture Diagram](./images/image.png)
 
-## High-Level Architecture
+*Figure: High‑level architecture of the Azure Guacamole Lab*
 
-<p align="center">
-  <a href="./images/image.png">
-    <img src="./images/image.png" alt="Architecture Diagram">
-  </a>
-</p>
+---
 
-<p align="center">
-  <em>Figure: High-level architecture of the Azure Guacamole Lab</em>
-</p>
+## Quick Start
 
+### Prerequisites
+
+- Azure subscription
+- Azure CLI (`az login`)
+- Terraform ≥ 1.6
+- Git
+
+### Steps
+
+```bash
+git clone https://github.com/ratanGit/terraform-azure-lab.git
+cd terraform-azure-lab
+
+terraform init
+terraform plan
+terraform apply
+```
+⚠️ **Warning**
+This lab deploys Azure resources that may incur cost. Remember to destroy the environment when finished:
+```bash
+terraform destroy
+```
 
 ### Key Components
-
 *   **Azure Virtual Network (VNet‑Lab‑Guacamole)**
-*   **Public Subnet**
-    *   Apache Guacamole Gateway
-    *   Linux Router (NAT replacement)
-*   **Private Subnet**
-    *   Windows Server lab machines (IAM, migration, testing)
-    *   Internal Linux / Docker workloads
-*   **Internet**
-    *   HTTPS access to Guacamole
-    *   Outbound internet via Linux router
+    *   Public Subnet (Guacamole access)
+    *   Private subnet (internal workloads)
+*   **Apache Guacamole**
+    *   HTTPS remote access gateway
+    *   Browser‑based SSH/RDP
+*   **Private Workloads**
+    *   Windows Server lab VMs
+    *   Internal Linux / Docker lab
+*   **Security Controls**
+    *   Network Security Groups
+    *   No public access to internal VMs
+    *   Entra ID Authentication based access to Guacamole (ZT)
+    *   Let's Encrypt TLS certificate
 
 ***
 
-## Design Goals
-
-*   ✅ **No public IPs on internal workloads**
-*   ✅ **Browser‑based access (SSH / RDP)**
-*   ✅ **Replace Azure NAT Gateway (cost optimization)**
-*   ✅ **Environment‑driven (lab / prod ready)**
-*   ✅ **Infrastructure as Code (Terraform)**
-
-***
-
-## Network Flow Explanation
+## Network Flow
 
 ### Inbound (User Access)
 
-1.  User connects over the **Internet (HTTPS)**
-2.  Traffic reaches **Apache Guacamole** in the **public subnet**
-3.  Guacamole brokers:
+1.  User connects via **Internet (HTTPS)**
+2.  Traffic reaches **Apache Guacamole**
+3.  Guacamole **proxies**:
     *   SSH to Linux VMs
     *   RDP to Windows Servers
-4.  Connections are proxied **into the private subnet**
-5.  Internal machines remain **non‑internet‑facing**
+4.  Connections terminate in the private subnet
 
 ### Outbound (Internet Access from Private Subnet)
 
@@ -77,106 +93,29 @@ The design follows **modern Zero Trust principles**:
 
 ***
 
-## Key Features
-
-### Apache Guacamole Gateway
-
-*   Web‑based access to **SSH and RDP**
-*   Single entry point
-*   Integrates with **Microsoft Entra ID** (planned/optional)
-*   No VPN required for users
-
-### Linux Router (NAT Replacement)
-
-*   Ubuntu‑based VM
-*   Dual‑homed NICs:
-    *   WAN (public subnet)
-    *   LAN (private subnet)
-*   Uses `iptables` for NAT
-*   Replaces **Azure NAT Gateway** to reduce cost
-
-### Private Workloads
-
-*   Windows Server lab VMs
-*   Internal Linux VMs
-*   Docker‑based applications
-*   No public IPs
-*   Reachable only via Guacamole or internal routing
-
-***
 ## Infrastructure as Code
-
-*   **Terraform**
-    *   Environment‑driven variables (`lab`, `prod`)
-    *   Centralized locals for naming & tagging
-    *   Modular, readable structure
-*   **Terraform‑managed SSH keys**
-    *   RSA 4096
-    *   Shared securely across Linux infrastructure
-
-***
-
-## Outputs & Access Information
-
-After deployment, Terraform outputs structured information including:
-
-*   **Guacamole public IP & HTTPS URL**
-*   **Linux Router public IP**
-*   **Private Linux VM IP**
-*   **Ready‑to‑use SSH commands**
-
-Example:
-
+*   **Terraform**:
+    *   Environment‑driven variables
+    *   Centralized locals and tagging for Azure resources
+    *   Clear, readable structure
+    *   Centralized Change Documentation
+*   **Terraform‑managed SSH**:
+    *   SSH key generation
+    *   No Hardcoded credentials
+*   **Terraform‑automation of VMs**:
+    *   Cloud-init based automation for Docker, Guacamole & Router
+## Outputs
+    *   Guacamole public IP
+    *   VM private IPs
+    *   Data for Terraform projects built on the base networking
+    *   Helpful SSH connection commands
 ```bash
 terraform output access_information
 ```
 
-This makes the environment easy to consume both by humans and downstream Terraform projects (`remote_state`).
-
-***
-
-## Security Considerations
-
-*   No public access to private subnets
-*   SSH/RDP access only via Guacamole
-*   Controlled outbound flow via Linux router
-*   Centralized SSH key management
-*   NSG hardening supported (optional extension)
-
-***
-
-## Cost Optimization
-
-| Component | Azure Native         | This Project    |
-| --------- | -------------------- | --------------- |
-| NAT       | Azure NAT Gateway    | Linux Router    |
-| Cost      | High (monthly fixed) | Low (VM only)   |
-| Control   | Limited              | Full (iptables) |
-
-This design significantly reduces monthly Azure spend for lab and non‑production environments.
-
-***
-
-## Requirements
-
-*   Terraform ≥ 1.x
-*   Azure CLI authenticated
-*   SSH key (Terraform‑generated or existing)
-*   Azure subscription
-
-***
-
-## Future Enhancements
-
-*   WireGuard VPN on Linux Router
-*   High‑Availability router setup
-*   Entra ID enforced Guacamole auth
-*   Modularization for reuse
-*   CI/CD pipeline for Terraform
-
-***
-
-## NGINX Proxy
+### NGINX Proxy Manager – Guacamole Configuration
+sample nginx.conf
+```bash
 # Redirect root to Guacamole
 location = / {
     return 301 /guacamole/;
@@ -196,15 +135,36 @@ location /guacamole/ {
 
     proxy_read_timeout 3600s;
     proxy_send_timeout 3600s;
-}
+```
+***
+
+## Future Enhancements
+
+*   WireGuard VPN
+*   High‑availability ingress
+*   Terraform modules
+*   OPNsense Firewall to replace the linux router
+
+***
+
+## Cost Optimization
+
+| Component | Azure Native         | This Project    |
+| --------- | -------------------- | --------------- |
+| NAT       | Azure NAT Gateway    | Linux Router    |
+| Cost      | High (monthly fixed) | Low (VM only)   |
+| Control   | Limited              | Full (iptables) |
+
+This design significantly reduces monthly Azure spend for lab and non‑production environments.
+
+***
 
 ## Author
 
 **Ratan Mohapatra**  
-Azure | Zero Trust | Cloud Architecture
+Azure | AWS | Zero Trust | Cloud Architecture | Terraform | Nextgen Firewalls
 
 ***
-
 
 
 ## License
