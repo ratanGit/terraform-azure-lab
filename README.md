@@ -16,9 +16,19 @@ The design follows **modern Zero Trust principles**:
 
 ## High-Level Architecture
 
-[![Architecture Diagram](./images/image.png)](./images/image.png)
 
-<small>*Figure: High-level architecture of the Azure Guacamole lab*</small>
+## High-Level Architecture
+
+<p align="center">
+  <a href="./images/image.png">
+    <img src="./images/image.png" alt="Architecture Diagram">
+  </a>
+</p>
+
+<p align="center">
+  <em>Figure: High-level architecture of the Azure Guacamole Lab</em>
+</p>
+
 
 ### Key Components
 
