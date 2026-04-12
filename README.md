@@ -14,9 +14,12 @@ The design follows **modern Zero Trust principles**:
 
 ***
 
-## High‑Level Architecture
 
-./image.png
+## High-Level Architecture
+
+[![Architecture Diagram](./images/image.png)](./images/image.png)
+
+*Figure: High-level architecture of the Azure Guacamole lab*
 
 ### Key Components
 
@@ -180,3 +183,7 @@ If you’d like, next I can:
 *   Prepare a **second diagram (ingress vs egress)**
 
 
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
