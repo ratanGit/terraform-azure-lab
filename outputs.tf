@@ -1,36 +1,78 @@
 ###############################################################################
 # OUTPUTS - PROJECT: Guacamole
-# Logical Sections: Information, Key Features, Access Information
+#
+# DESIGN PRINCIPLES:
+# - `foundation` is the ONLY stable contract for downstream Terraform usage
+# - `information` and `key_features` are human-readable summaries
+# - `access_information` is for local / operational use only
 ###############################################################################
 
 ############################################
-# INFORMATION
+# FOUNDATION OUTPUTS (FOR REUSE)
+############################################
+
+output "foundation" {
+  description = "Stable infrastructure primitives intended for reuse by other Terraform projects"
+
+  value = {
+    resource_group = {
+      name = azurerm_resource_group.this.name
+      id   = azurerm_resource_group.this.id
+    }
+
+    location    = var.location
+    environment = var.environment
+    project     = var.project
+
+    virtual_network = {
+      id            = azurerm_virtual_network.this.id
+      name          = azurerm_virtual_network.this.name
+      address_space = azurerm_virtual_network.this.address_space
+    }
+
+    subnets = {
+      for k, s in azurerm_subnet.this :
+      k => {
+        id             = s.id
+        name           = s.name
+        address_prefix = s.address_prefixes
+      }
+    }
+
+    tags = local.common_tags
+  }
+}
+
+############################################
+# INFORMATION (HUMAN-READABLE SUMMARY)
 ############################################
 
 output "information" {
-  description = "High-level infrastructure information"
+  description = "High-level, human-readable summary of the deployed environment (not for downstream Terraform consumption)"
+
   value = {
-    resource_group = azurerm_resource_group.this.name
-    location       = var.location
-    environment    = var.environment
     project        = var.project
-    vnet_id        = azurerm_virtual_network.this.id
-    subnet_ids = {
-      for k, s in azurerm_subnet.this :
-      k => s.id
+    environment    = var.environment
+    location       = var.location
+    resource_group = azurerm_resource_group.this.name
+
+    networking = {
+      vnet_name    = azurerm_virtual_network.this.name
+      subnet_names = keys(azurerm_subnet.this)
     }
   }
 }
 
 ############################################
-# KEY FEATURES
+# KEY FEATURES (DOCUMENTATION)
 ############################################
 
 output "key_features" {
-  description = "Key infrastructure components deployed in this environment"
+  description = "Key infrastructure components deployed in this environment (descriptive only)"
+
   value = {
     guacamole_gateway = {
-      purpose = "Remote access gateway (Web-based SSH/RDP via Guacamole)"
+      purpose = "Remote access gateway providing web-based SSH/RDP via Apache Guacamole"
       network = "Public subnet"
     }
 
@@ -47,11 +89,12 @@ output "key_features" {
 }
 
 ############################################
-# ACCESS INFORMATION
+# ACCESS INFORMATION (OPERATIONAL / LOCAL USE)
+# NOT INTENDED FOR DOWNSTREAM TERRAFORM CONSUMPTION
 ############################################
 
 output "access_information" {
-  description = "Access endpoints and SSH commands for all major components"
+  description = "Operational access endpoints and helper SSH commands for administrators"
 
   value = {
     guacamole = {
